@@ -5,13 +5,9 @@
 
 Tracked Events: "EmailCustomer", "SendAnswer", "FollowUp"
 
-1 Standard Evens History: 
+1. Standard Evens History: EmailCustomer -> SendAnswer -> FollowUp -> SendAnswer -> ...
 
-EmailCustomer -> SendAnswer -> FollowUp -> SendAnswer -> ...
-
-2. also possible Evens History: 
-
-SendAnswer -> SendAnswer -> FollowUp -> FollowUp -> ...
+2. also possible Evens History: SendAnswer -> SendAnswer -> FollowUp -> FollowUp -> ...
 
 ## Install
  
