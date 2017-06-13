@@ -86,7 +86,7 @@ foreach ($tickets as $ticket) {
 	        'history_type' 	=> $row['history_type'],
 	        'ticket_nr' 	=> $ticket['tn'],
 	        'ticket_id' 	=> intval($row['ticket_id']),
-	        'iteration'		=> $iteration,
+	        'iteration'	=> $iteration,
 	        'response_time' => $responseTime,
 	        'response_time_in_hours' => gmdate("H i", $responseTime) ,
 	        '@timestamp' =>  gmdate("Y-m-d\TH:i:s\Z", strtotime($row['create_time']))
