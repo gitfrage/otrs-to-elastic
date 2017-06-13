@@ -1,7 +1,7 @@
 
 # Otrs (github.com/OTRS) To Elastic/Kibana export
 
-## User Cases: Key Performance Indicator (KPI) Tracker 
+## Use Cases: Key Performance Indicator (KPI) Tracker 
 
 Tracked Events: "EmailCustomer", "SendAnswer", "FollowUp"
 
@@ -31,7 +31,7 @@ php composer.phar update && php export.php
 
 ## OTRS Ticket Domain Model
 
-
+https://github.com/OTRS/otrs/blob/master/development/diagrams/Database/OTRSDatabaseDiagram.png
 
 => To differentiate "FollowUp" history events between interen and extern User (wich we want to track) filter by time: 
 
