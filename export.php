@@ -20,16 +20,16 @@ foreach ($tickets as $ticket) {
 
 	$query = '
 		SELECT 		th.ticket_id,
-					th.create_time,
-					tht.name AS history_type
+				th.create_time,
+				tht.name AS history_type
 		FROM 		ticket t
 		INNER JOIN	ticket_history th ON t.id = th.ticket_id
 		INNER JOIN 	ticket_history_type tht ON th.history_type_id = tht.id
 		LEFT JOIN	article a ON th.article_id = a.id
 		LEFT JOIN	article_type at ON at.id = a.article_type_id
 		WHERE		t.id = ' . $ticket['id'] . '
-		AND 	    tht.name IN ("EmailCustomer", "SendAnswer", "FollowUp")
-		AND		    at.name = "email-external"
+		AND 	    	tht.name IN ("EmailCustomer", "SendAnswer", "FollowUp")
+		AND		at.name = "email-external"
 		AND 		th.change_time NOT IN (
 			SELECT change_time 
 			FROM  ticket_history 
