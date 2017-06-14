@@ -5,7 +5,7 @@ include 'include/client.php';
 
 // get changed tickets (since last script run)
 
-$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
+$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d")-10, date("Y")));
 $query = 'SELECT id, tn FROM ticket WHERE change_time > '. $dbh->quote($lastday); 
 
 $tickets = $dbh->query($query)->fetchAll();
@@ -55,6 +55,7 @@ foreach ($tickets as $ticket) {
 
 	    $responseTime = 0;	    
 	    if ($row['history_type'] == 'SendAnswer' && 
+	    	!empty($lastEvent['history_type']) &&
 	    	($lastEvent['history_type'] == 'EmailCustomer' || $lastEvent['history_type'] == 'FollowUp')) {
 	    	$iteration++;
 	    	$responseTime = strtotime($row['create_time']) - strtotime($lastEvent['create_time']);
@@ -63,14 +64,18 @@ foreach ($tickets as $ticket) {
 	    // edge case: 
 	    // "FollowUp" --> "FollowUp" 
 	    
-	    if ($row['history_type'] == 'FollowUp' && $lastEvent['history_type'] == 'FollowUp') {
+	    if ($row['history_type'] == 'FollowUp' && 
+	    	!empty($lastEvent['history_type']) && 
+	    	$lastEvent['history_type'] == 'FollowUp') {
 	    	$row['create_time'] = $lastEvent['create_time'];
 	    }
 
 	    // edge case: 
 	    // "SendAnswer" --> "SendAnswer" 
 
-	    if ($row['history_type'] == 'SendAnswer' &&  $lastEvent['history_type'] == 'SendAnswer') {
+	    if ($row['history_type'] == 'SendAnswer' &&  
+	    	!empty($lastEvent['history_type']) && 
+	    	$lastEvent['history_type'] == 'SendAnswer') {
 	    	continue;
 	    }
 
@@ -99,7 +104,7 @@ foreach ($tickets as $ticket) {
 
 	if (count($params['body']) > 0) {
 		$results = $client->bulk($params);
-		print_r(($results);
+		print_r($results);
 		$params = '';
 	}
 	
