@@ -12,9 +12,9 @@ Tracked Events: "EmailCustomer", "SendAnswer", "FollowUp"
 ## Install
  
 ```
-# start elastic and kibana:
+# start elastic and grafana:
 /Downloads/elasticsearch-5.4.1$ bin/elasticsearch
-/Downloads/kibana-5.4.1-linux-x86_64$ bin/kibana
+/Downloads/grafana-4.3.2$ bin/grafana-server
 
 # make ssh tunel to mysql like
 ssh -v -L 3366:localhost:3306 use@server
@@ -22,7 +22,7 @@ ssh -v -L 3366:localhost:3306 use@server
 # run export 
 php composer.phar update && php export.php
 
-# import kibana.json to kibana
+# import kibana.json to grafana
 ```
 
 ## OTRS Ticket Domain Model

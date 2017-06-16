@@ -1,100 +1,655 @@
-[
-  {
-    "_id": "fbad3550-4f75-11e7-8fdd-d9fba3a55c2e",
-    "_type": "visualization",
-    "_source": {
-      "title": "sendAnswer Histogram",
-      "visState": "{\"title\":\"sendAnswer Histogram\",\"type\":\"histogram\",\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"@timestamp per hour\"},\"type\":\"category\"}],\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"radiusRatio\":9,\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Sum of response_time\"},\"drawLinesBetweenPoints\":true,\"mode\":\"stacked\",\"show\":\"true\",\"showCircles\":true,\"type\":\"histogram\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"showCircles\":true,\"times\":[],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"mode\":\"normal\",\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Sum of response_time\"},\"type\":\"value\"}]},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"sum\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\"}},{\"id\":\"2\",\"enabled\":true,\"type\":\"date_histogram\",\"schema\":\"segment\",\"params\":{\"field\":\"@timestamp\",\"interval\":\"h\",\"customInterval\":\"2h\",\"min_doc_count\":1,\"extended_bounds\":{}}},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"schema\":\"group\",\"params\":{\"field\":\"ticket_id\",\"size\":5,\"order\":\"desc\",\"orderBy\":\"1\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"analyze_wildcard\":true,\"query\":\"sendAnswer\"}},\"filter\":[]}"
-      }
-    }
+{
+  "annotations": {
+    "list": []
   },
-  {
-    "_id": "949b4b00-4f51-11e7-ba5b-75b92c3b854a",
-    "_type": "visualization",
-    "_source": {
-      "title": "first iteration time",
-      "visState": "{\"title\":\"first iteration time\",\"type\":\"metric\",\"params\":{\"fontSize\":60,\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\",\"customLabel\":\"first iteration response\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"query\":\"iteration:1\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "hideControls": false,
+  "id": 2,
+  "links": [],
+  "refresh": false,
+  "rows": [
+    {
+      "collapse": false,
+      "height": -748,
+      "panels": [],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Dashboard Row",
+      "titleSize": "h6"
+    },
+    {
+      "collapse": false,
+      "height": -501,
+      "panels": [
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "otrs",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 1,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "SendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Requests answered",
+          "transparent": false,
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "total"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "otrs",
+          "decimals": null,
+          "format": "dtdurations",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 2,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "avg"
+                }
+              ],
+              "query": "iteration:1 AND sendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Average Response Time FIRST Answer",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "otrs",
+          "decimals": null,
+          "format": "dtdurations",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 3,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "avg"
+                }
+              ],
+              "query": "iteration:2 AND sendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Average Response Time SECOND Answer",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "otrs",
+          "decimals": null,
+          "format": "dtdurations",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 5,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "min"
+                }
+              ],
+              "query": "sendAnswer AND response_time:>0",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Min Response Time",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "min"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "otrs",
+          "decimals": null,
+          "format": "dtdurations",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 6,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "max"
+                }
+              ],
+              "query": "sendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Max Response Time",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "otrs",
+          "decimals": null,
+          "format": "dtdurations",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "id": 4,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "avg"
+                }
+              ],
+              "query": "sendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Average Response Time",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        }
+      ],
+      "repeat": null,
+      "repeatIteration": null,
+      "repeatRowId": null,
+      "showTitle": false,
+      "title": "Dashboard Row",
+      "titleSize": "h6"
     }
+  ],
+  "schemaVersion": 14,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
   },
-  {
-    "_id": "cea7faf0-4f51-11e7-ba5b-75b92c3b854a",
-    "_type": "visualization",
-    "_source": {
-      "title": "second iteration time",
-      "visState": "{\"title\":\"second iteration time\",\"type\":\"metric\",\"params\":{\"fontSize\":60,\"handleNoResults\":true},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\",\"customLabel\":\"second iteration time\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"query\":\"iteration:2\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
-    }
+  "time": {
+    "from": "now/d",
+    "to": "now/d"
   },
-  {
-    "_id": "7ae81ea0-4f50-11e7-a206-01d871797f28",
-    "_type": "visualization",
-    "_source": {
-      "title": "max response time",
-      "visState": "{\"title\":\"max response time\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\",\"customLabel\":\"Iterations\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
-    }
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
   },
-  {
-    "_id": "415f4f40-4f51-11e7-ba5b-75b92c3b854a",
-    "_type": "visualization",
-    "_source": {
-      "title": "av response",
-      "visState": "{\"title\":\"av response\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\",\"customLabel\":\"av response time\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
-    }
-  },
-  {
-    "_id": "e706ccd0-4f50-11e7-a206-01d871797f28",
-    "_type": "visualization",
-    "_source": {
-      "title": "min response time",
-      "visState": "{\"title\":\"min response time\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"min\",\"schema\":\"metric\",\"params\":{\"field\":\"response_time\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"query\":\"*\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
-    }
-  },
-  {
-    "_id": "aef52990-4f50-11e7-a206-01d871797f28",
-    "_type": "visualization",
-    "_source": {
-      "title": "Iterations",
-      "visState": "{\"title\":\"Iterations\",\"type\":\"metric\",\"params\":{\"handleNoResults\":true,\"fontSize\":60},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"schema\":\"metric\",\"params\":{\"field\":\"iteration\"}}],\"listeners\":{}}",
-      "uiStateJSON": "{}",
-      "description": "",
-      "version": 1,
-      "kibanaSavedObjectMeta": {
-        "searchSourceJSON": "{\"index\":\"otrs\",\"query\":{\"query_string\":{\"query\":\"sendAnswer\",\"analyze_wildcard\":true}},\"filter\":[]}"
-      }
-    }
-  }
-]
+  "timezone": "browser",
+  "title": "otrs-kpi",
+  "version": 1
+}
