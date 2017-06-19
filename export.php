@@ -134,7 +134,6 @@ foreach ($tickets as $ticket)	{
 
 	if (count($params['body']) > 0) {
 		$results = $client->bulk($params);
-		print_r($results);
 		$params = '';
 	}
 	
