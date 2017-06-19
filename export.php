@@ -14,21 +14,28 @@ if ($opt) {
 }
 
 try {
-	$conf = file_get_contents(Yaml::parse($filename));
+	$conf = Yaml::parse(file_get_contents($filename));
 } catch (Exception $e) {
 	printf("Unable to get or parse the YAML: %s", $e->getMessage());
 }
 
-$dsn = 'mysql:host='.$conf['mysql']['host'].';port='.$conf['mysql']['port'].';dbname='.$conf['mysql']['dbname'];
+$dsn = 'mysql:host=' 
+	. $conf['mysql']['host'] 
+	. ';port='.$conf['mysql']['port'] 
+	. ';dbname='.$conf['mysql']['dbname'];
+
 $options = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
+
 $dbh = new \PDO($dsn, $conf['mysql']['user'], $conf['mysql']['pass'], $options);
 
-$hosts = ['http://'. $conf['elastic']['host'] . ':' . $conf['elastic']['port']];
+$hosts = ['http://'. $conf['elastic']['host'] 
+	. ':' . $conf['elastic']['port']];
+
 $client = ClientBuilder::create()->setHosts($hosts)->allowBadJSONSerialization()->build();
 
 // get changed tickets (since last script run)
 
-$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m")-6, date("d"), date("Y")));
+$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
 $query = 'SELECT id, tn FROM ticket WHERE change_time > '. $dbh->quote($lastday); 
 
 $tickets = $dbh->query($query)->fetchAll();
@@ -127,6 +134,7 @@ foreach ($tickets as $ticket)	{
 
 	if (count($params['body']) > 0) {
 		$results = $client->bulk($params);
+		print_r($results);
 		$params = '';
 	}
 	
