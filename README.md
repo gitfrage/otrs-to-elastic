@@ -12,15 +12,19 @@ Tracked Events: "EmailCustomer", "SendAnswer", "FollowUp"
 ## Install
  
 ```
+
+# run export with default config yaml
+run export.php
+
+# run export with optional config yaml 
+run export.php -f[config.yml]
+
 # start elastic and grafana:
 /Downloads/elasticsearch-5.4.1$ bin/elasticsearch
 /Downloads/grafana-4.3.2$ bin/grafana-server
 
 # make ssh tunel to mysql like
 ssh -v -L 3366:localhost:3306 use@server
-
-# run export 
-php composer.phar update && php export.php
 
 # import kibana.json to grafana
 ```
