@@ -52,7 +52,7 @@ foreach ($tickets as $ticket)	{
 		LEFT JOIN	article_type at ON at.id = a.article_type_id
 		WHERE 		t.id = ' . $ticket['id'] . '
 		AND 		tht.name IN ("EmailCustomer", "SendAnswer", "FollowUp")
-		AND			at.name = "email-external"
+		AND 		at.name = "email-external"
 		AND 		th.change_time NOT IN (
 			SELECT change_time 
 			FROM ticket_history 
