@@ -1,0 +1,23 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArgvInput;
+
+// if you don't want to setup permissions the proper way, just uncomment the following PHP line
+// read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information
+//umask(0000);
+set_time_limit(0);
+
+/**
+ * @var Composer\Autoload\ClassLoader $loader
+ */
+$loader = require __DIR__ . '/../vendor/autoload.php';
+$input  = new ArgvInput();
+
+$application = new Application();
+$application->addCommands([
+    new \Otrs\Import\Command\OtrsImportCommand(),
+]);
+
+$application->run($input);
