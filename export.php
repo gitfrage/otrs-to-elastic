@@ -8,47 +8,57 @@ use Symfony\Component\Yaml\Yaml;
 $opt = getopt("f::");
 
 if ($opt) {
-	$filename = $opt['f'];
+    $filename = $opt['f'];
 } else {
-	$filename ='./config/config.yml';
+    $filename = './config/config.yml';
+}
+
+
+try {
+    $conf = Yaml::parse(file_get_contents($filename));
+} catch (Exception $e) {
+    printf("Unable to get or parse the YAML: %s", $e->getMessage());
+    die();
 }
 
 try {
-	$conf = Yaml::parse(file_get_contents($filename));
+    $dsn = 'mysql:host='
+        . $conf['mysql']['host']
+        . ';port=' . $conf['mysql']['port']
+        . ';dbname=' . $conf['mysql']['dbname'];
+
+
+    $dbh = new \PDO($dsn, $conf['mysql']['user'], $conf['mysql']['pass'], [
+        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
+    ]);
 } catch (Exception $e) {
-	printf("Unable to get or parse the YAML: %s", $e->getMessage());
+    printf("Error connecting database: %s", $e->getMessage());
+    die();
 }
 
-$dsn = 'mysql:host=' 
-	. $conf['mysql']['host'] 
-	. ';port='.$conf['mysql']['port'] 
-	. ';dbname='.$conf['mysql']['dbname'];
-
-$options = array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8');
-
-$dbh = new \PDO($dsn, $conf['mysql']['user'], $conf['mysql']['pass'], $options);
-
-$hosts = ['http://'. $conf['elastic']['host'] 
-	. ':' . $conf['elastic']['port']];
+$hosts = [
+    'http://' . $conf['elastic']['host']
+    . ':' . $conf['elastic']['port'],
+];
 
 $client = ClientBuilder::create()->setHosts($hosts)->allowBadJSONSerialization()->build();
 
 // get changed tickets (since last script run)
 
-$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d")-1, date("Y")));
-$query = 'SELECT id, tn FROM ticket WHERE change_time > '. $dbh->quote($lastday); 
+$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d") - 1, date("Y")));
+$query   = 'SELECT id, tn FROM ticket WHERE change_time > ' . $dbh->quote($lastday);
 
 $tickets = $dbh->query($query)->fetchAll();
 if (count($tickets) == 0) {
-	die('no tickets found');
+    die('No tickets found');
 }
 
-foreach ($tickets as $ticket)	{
+foreach ($tickets as $ticket) {
 
-	// get history per ticket
-	// exclude some events (filter "FollowUp" events from internal actions)
+    // get history per ticket
+    // exclude some events (filter "FollowUp" events from internal actions)
 
-	$query = '
+    $query = '
 		SELECT 		th.ticket_id,
 					th.create_time,
 					tht.name AS history_type
@@ -63,78 +73,81 @@ foreach ($tickets as $ticket)	{
 		AND 		th.change_time NOT IN (
 			SELECT change_time 
 			FROM ticket_history 
-			WHERE ticket_id = '. $ticket['id'] .'
+			WHERE ticket_id = ' . $ticket['id'] . '
 			AND change_by = 1 
 			AND (ticket_history.name LIKE "%customer response required%" OR ticket_history.name LIKE "%internal response required%")
 		)
 	';
-		
-	$ticket_history_rows = $dbh->query($query)->fetchAll();
-	if (count($ticket_history_rows) == 0)  {
-		echo 'no ticket history found';
-		continue;
-	}
 
-	$lastEvent = [];
-	$iteration = 0;
+    $ticket_history_rows = $dbh->query($query)->fetchAll();
+    if (count($ticket_history_rows) == 0) {
+        echo 'no ticket history found';
+        continue;
+    }
 
-	foreach($ticket_history_rows as $row) {    
+    $lastEvent = [];
+    $iteration = 0;
 
-		// standard case: 
-		// lastEvent "EmailCustomer or FollowUp" --> "SendAnswer" 
+    foreach ($ticket_history_rows as $row) {
 
-		$responseTime = 0;	    
-		if ($row['history_type'] == 'SendAnswer' && 
-			!empty($lastEvent['history_type']) &&
-			($lastEvent['history_type'] == 'EmailCustomer' || $lastEvent['history_type'] == 'FollowUp')) {
-			$iteration++;
-			$responseTime = strtotime($row['create_time']) - strtotime($lastEvent['create_time']);
-		}
+        // standard case:
+        // lastEvent "EmailCustomer or FollowUp" --> "SendAnswer"
 
-		// edge case: 
-		// "FollowUp" --> "FollowUp" 
+        $responseTime = 0;
+        if ($row['history_type'] == 'SendAnswer' &&
+            !empty($lastEvent['history_type']) &&
+            ($lastEvent['history_type'] == 'EmailCustomer' || $lastEvent['history_type'] == 'FollowUp')
+        ) {
+            $iteration++;
+            $responseTime = strtotime($row['create_time']) - strtotime($lastEvent['create_time']);
+        }
 
-		if ($row['history_type'] == 'FollowUp' && 
-			!empty($lastEvent['history_type']) && 
-			$lastEvent['history_type'] == 'FollowUp') {
-			$row['create_time'] = $lastEvent['create_time'];
-		}
+        // edge case:
+        // "FollowUp" --> "FollowUp"
 
-		// edge case: 
-		// "SendAnswer" --> "SendAnswer" 
+        if ($row['history_type'] == 'FollowUp' &&
+            !empty($lastEvent['history_type']) &&
+            $lastEvent['history_type'] == 'FollowUp'
+        ) {
+            $row['create_time'] = $lastEvent['create_time'];
+        }
 
-		if ($row['history_type'] == 'SendAnswer' &&  
-			!empty($lastEvent['history_type']) && 
-			$lastEvent['history_type'] == 'SendAnswer') {
-			continue;
-		}
+        // edge case:
+        // "SendAnswer" --> "SendAnswer"
 
-		// build params for elastic
+        if ($row['history_type'] == 'SendAnswer' &&
+            !empty($lastEvent['history_type']) &&
+            $lastEvent['history_type'] == 'SendAnswer'
+        ) {
+            continue;
+        }
 
-		$params['body'][] = [
-		'index' => [
-			'_index' => 'otrs',
-			'_type' => 'app',
-		]
-		];
-		$params['body'][] = [	
-			'history_type' 	=> $row['history_type'],
-			'ticket_nr' 	=> $ticket['tn'],
-			'ticket_id' 	=> intval($row['ticket_id']),
-			'iteration'	=> $iteration,
-			'response_time' => $responseTime,
-			'response_time_in_hours' => gmdate("H i", $responseTime) ,
-			'@timestamp' =>  gmdate("Y-m-d\TH:i:s\Z", strtotime($row['create_time']))
-		];
+        // build params for elastic
 
-		$lastEvent = $row;
-	}
+        $params['body'][] = [
+            'index' => [
+                '_index' => 'otrs',
+                '_type'  => 'app',
+            ],
+        ];
+        $params['body'][] = [
+            'history_type'           => $row['history_type'],
+            'ticket_nr'              => $ticket['tn'],
+            'ticket_id'              => intval($row['ticket_id']),
+            'iteration'              => $iteration,
+            'response_time'          => $responseTime,
+            'response_time_in_hours' => gmdate("H i", $responseTime),
+            '@timestamp'             => gmdate("Y-m-d\TH:i:s\Z", strtotime($row['create_time'])),
+        ];
 
-	// bulk to elastic and clan params
+        $lastEvent = $row;
+    }
 
-	if (count($params['body']) > 0) {
-		$results = $client->bulk($params);
-		$params = '';
-	}
-	
+    // bulk to elastic and clan params
+
+    if (count($params['body']) > 0) {
+        $results = $client->bulk($params);
+        $params  = '';
+    }
+
 }
