@@ -1,4 +1,34 @@
 {
+  "__inputs": [
+    {
+      "name": "DS_OTRS",
+      "label": "OTRS",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "elasticsearch",
+      "pluginName": "Elasticsearch"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "datasource",
+      "id": "elasticsearch",
+      "name": "Elasticsearch",
+      "version": "3.0.0"
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "4.3.1"
+    },
+    {
+      "type": "panel",
+      "id": "singlestat",
+      "name": "Singlestat",
+      "version": ""
+    }
+  ],
   "annotations": {
     "list": []
   },
@@ -6,7 +36,7 @@
   "gnetId": null,
   "graphTooltip": 0,
   "hideControls": false,
-  "id": 2,
+  "id": null,
   "links": [],
   "refresh": false,
   "rows": [
@@ -23,7 +53,7 @@
     },
     {
       "collapse": false,
-      "height": -501,
+      "height": -907,
       "panels": [
         {
           "cacheTimeout": null,
@@ -34,7 +64,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "otrs",
+          "datasource": "${DS_OTRS}",
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -43,6 +73,7 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
+          "height": "80px",
           "id": 1,
           "interval": null,
           "links": [],
@@ -129,7 +160,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "otrs",
+          "datasource": "${DS_OTRS}",
           "decimals": null,
           "format": "dtdurations",
           "gauge": {
@@ -226,7 +257,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "otrs",
+          "datasource": "${DS_OTRS}",
           "decimals": null,
           "format": "dtdurations",
           "gauge": {
@@ -323,9 +354,9 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "otrs",
+          "datasource": "${DS_OTRS}",
           "decimals": null,
-          "format": "dtdurations",
+          "format": "s",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -333,6 +364,7 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
+          "height": "80px",
           "id": 5,
           "interval": null,
           "links": [],
@@ -420,9 +452,9 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "otrs",
+          "datasource": "${DS_OTRS}",
           "decimals": null,
-          "format": "dtdurations",
+          "format": "s",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -430,6 +462,7 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
+          "height": "80px",
           "id": 6,
           "interval": null,
           "links": [],
@@ -506,7 +539,7 @@
               "value": "null"
             }
           ],
-          "valueName": "avg"
+          "valueName": "max"
         },
         {
           "cacheTimeout": null,
@@ -517,9 +550,9 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "otrs",
+          "datasource": "${DS_OTRS}",
           "decimals": null,
-          "format": "dtdurations",
+          "format": "s",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -527,6 +560,7 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
+          "height": "80px",
           "id": 4,
           "interval": null,
           "links": [],
@@ -604,6 +638,103 @@
             }
           ],
           "valueName": "avg"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "${DS_OTRS}",
+          "format": "none",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "height": "80px",
+          "id": 7,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "type": "count"
+                }
+              ],
+              "query": "SendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "timeFrom": "7d",
+          "title": "Requests answered",
+          "transparent": false,
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "total"
         }
       ],
       "repeat": null,
@@ -651,5 +782,5 @@
   },
   "timezone": "browser",
   "title": "otrs-kpi",
-  "version": 1
+  "version": 2
 }
