@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 use Elasticsearch\ClientBuilder;
 use Symfony\Component\Yaml\Yaml;
 
-$opt = getopt("f:v::");
+$opt = getopt("f:v::d:");
 
 if ($opt) {
     $filename = $opt['f'];
@@ -20,8 +20,8 @@ try {
     exit(1);
 }
 
-if (empty($argv[1])) {
-    echo "Usage ${argv[0]} [date]\n";
+if (empty($opt['d'])) {
+    echo "Usage ${argv[0]} -d[date]\n";
     echo " - date: Example date 2017-06-20\n";
     exit(1);
 }
@@ -55,7 +55,7 @@ $client = ClientBuilder::create()->setHosts($hosts)->allowBadJSONSerialization()
 
 // get changed tickets (since last script run)
 
-$lastday = $argv[1] . ' 00:00:00';
+$lastday = $opt['d'] . ' 00:00:00';
 
 if (strtotime($lastday) === false) {
     echo "Invalid date [${lastday}] given \n";
