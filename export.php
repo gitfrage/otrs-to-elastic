@@ -5,7 +5,7 @@ require 'vendor/autoload.php';
 use Elasticsearch\ClientBuilder;
 use Symfony\Component\Yaml\Yaml;
 
-$opt = getopt("f::");
+$opt = getopt("f:v::");
 
 if ($opt) {
     $filename = $opt['f'];
@@ -13,12 +13,17 @@ if ($opt) {
     $filename = './config/config.yml';
 }
 
-
 try {
     $conf = Yaml::parse(file_get_contents($filename));
 } catch (Exception $e) {
     printf("Unable to get or parse the YAML: %s", $e->getMessage());
-    die();
+    exit(1);
+}
+
+if (empty($argv[1])) {
+    echo "Usage ${argv[0]} [date]\n";
+    echo " - date: Example date 2017-06-20\n";
+    exit(1);
 }
 
 try {
@@ -31,9 +36,14 @@ try {
     $dbh = new \PDO($dsn, $conf['mysql']['user'], $conf['mysql']['pass'], [
         PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
     ]);
+
+    if ($opt['v']) {
+        printf("Database connection created\n");
+    }
+
 } catch (Exception $e) {
     printf("Error connecting database: %s", $e->getMessage());
-    die();
+    exit(1);
 }
 
 $hosts = [
@@ -45,16 +55,28 @@ $client = ClientBuilder::create()->setHosts($hosts)->allowBadJSONSerialization()
 
 // get changed tickets (since last script run)
 
-$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d") - 1, date("Y")));
-$query   = 'SELECT id, tn FROM ticket WHERE change_time > ' . $dbh->quote($lastday);
+$lastday = $argv[1] . ' 00:00:00';
+
+if (strtotime($lastday) === false) {
+    echo "Invalid date [${lastday}] given \n";
+    exit(1);
+}
+
+
+//$lastday = date("Y-m-d H:i:s", mktime(0, 0, 0, date("m"), date("d") - 1, date("Y")));
+$query = 'SELECT id, tn FROM ticket WHERE change_time > ' . $dbh->quote($lastday);
 
 $tickets = $dbh->query($query)->fetchAll();
 if (count($tickets) == 0) {
-    die('No tickets found');
+    echo "No tickets found\n";
+    exit(2);
 }
 
-foreach ($tickets as $ticket) {
+$params = [
+    'body' => [],
+];
 
+foreach ($tickets as $ticket) {
     // get history per ticket
     // exclude some events (filter "FollowUp" events from internal actions)
 
@@ -81,15 +103,20 @@ foreach ($tickets as $ticket) {
 
     $ticket_history_rows = $dbh->query($query)->fetchAll();
     if (count($ticket_history_rows) == 0) {
-        echo 'no ticket history found';
+        if ($opt['v']) {
+            printf("No ticket history found\n");
+        }
         continue;
     }
 
     $lastEvent = [];
     $iteration = 0;
 
-    foreach ($ticket_history_rows as $row) {
+    if ($opt['v']) {
+        printf("Ticket histrory rows: %d\n", count($ticket_history_rows));
+    }
 
+    foreach ($ticket_history_rows as $row) {
         // standard case:
         // lastEvent "EmailCustomer or FollowUp" --> "SendAnswer"
 
@@ -104,7 +131,6 @@ foreach ($tickets as $ticket) {
 
         // edge case:
         // "FollowUp" --> "FollowUp"
-
         if ($row['history_type'] == 'FollowUp' &&
             !empty($lastEvent['history_type']) &&
             $lastEvent['history_type'] == 'FollowUp'
@@ -114,7 +140,6 @@ foreach ($tickets as $ticket) {
 
         // edge case:
         // "SendAnswer" --> "SendAnswer"
-
         if ($row['history_type'] == 'SendAnswer' &&
             !empty($lastEvent['history_type']) &&
             $lastEvent['history_type'] == 'SendAnswer'
@@ -123,10 +148,9 @@ foreach ($tickets as $ticket) {
         }
 
         // build params for elastic
-
         $params['body'][] = [
             'index' => [
-                '_index' => 'otrs',
+                '_index' => $conf['elastic']['index'],
                 '_type'  => 'app',
             ],
         ];
@@ -144,10 +168,28 @@ foreach ($tickets as $ticket) {
     }
 
     // bulk to elastic and clan params
+    if (count($params['body']) > 400) {
+        if ($opt['v']) {
+            printf("Wrote %d entries to elastic\n", count($params['body']));
+        }
 
-    if (count($params['body']) > 0) {
         $results = $client->bulk($params);
-        $params  = '';
+        $params  = [
+            'body' => [],
+        ];
+    }
+}
+
+// bulk to elastic and clan params
+if (count($params['body']) > 0) {
+    if ($opt['v']) {
+        printf("Wrote %d entries to elastic\n", count($params['body']));
     }
 
+    $results = $client->bulk($params);
+    $params  = [
+        'body' => [],
+    ];
 }
+
+exit(0);
