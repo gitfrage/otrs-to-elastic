@@ -172,6 +172,30 @@ class OtrsImportCommand extends Command
 		');
     }
 
+    /**
+     * Returns Elastic Response Array 
+     *
+     * @param string $date
+     * @return array
+     */
+    private function elasticDeleteByQuery($date)
+    {
+        $params = [
+            'index' => $this->config['elastic']['index'],
+            'type'  => 'app',
+            'body'   => [
+                'query' => [
+                    'range' => [
+                        '@timestamp' => ['gte' => $date],
+                    ] 
+                ]
+            ]
+        ];
+
+        $result['deleted'] = '0';
+        $result = $this->esConnection->deleteByQuery($params);
+        return $result;
+    }
 
     /**
      * {@inheritdoc}
@@ -179,13 +203,18 @@ class OtrsImportCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $startTime = microtime(true);
-
         $startDate = $input->getArgument('date');
-
         if (strtotime($startDate) === false) {
             throw new \InvalidArgumentException('Invalid date format given');
         }
 
+        $deleted = $this->elasticDeleteByQuery($startDate);
+        if ($output->isVerbose()) {
+            $this->log(
+                sprintf('%d deleted events', $deleted['deleted']),
+                self::LOG_LEVEL_INFO
+            );
+        }
 
         $prep    = $this->getPreparedStatement();
         $tickets = $this->gatherTickets($startDate);
