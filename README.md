@@ -27,5 +27,3 @@ ssh -v -L 3366:localhost:3306 use@server
 ## OTRS Ticket Domain Model
 
 https://github.com/OTRS/otrs/blob/master/development/diagrams/Database/OTRSDatabaseDiagram.png
-
-=> To differentiate "FollowUp" history events between interen and extern User (wich we want to track) filter by time: 
