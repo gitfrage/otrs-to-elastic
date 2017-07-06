@@ -182,7 +182,7 @@ class OtrsImportCommand extends Command
     {
         $epoch = strtotime($date);
 
-        if ($epoc === false) {
+        if ($epoch === false) {
             throw new \InvalidArgumentException(sprintf(
                 'Could not convert given date [%s] using strtotime.',
                 $date
