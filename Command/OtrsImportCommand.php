@@ -173,27 +173,37 @@ class OtrsImportCommand extends Command
     }
 
     /**
-     * Returns Elastic Response Array 
+     * Returns Elastic Response Array
      *
      * @param string $date
      * @return array
      */
     private function elasticDeleteByQuery($date)
     {
+        $epoch = strtotime($date);
+
+        if ($epoc === false) {
+            throw new \InvalidArgumentException(sprintf(
+                'Could not convert given date [%s] using strtotime.',
+                $date
+            ));
+        }
+
         $params = [
             'index' => $this->config['elastic']['index'],
             'type'  => 'app',
-            'body'   => [
+            'body'  => [
                 'query' => [
                     'range' => [
-                        '@timestamp' => ['gte' => $date],
-                    ] 
-                ]
-            ]
+                        '@timestamp' => ['gte' => date('Y-m-d\TH:i:sO', $epoch)],
+                    ],
+                ],
+            ],
         ];
 
         $result['deleted'] = '0';
-        $result = $this->esConnection->deleteByQuery($params);
+        $result            = $this->esConnection->deleteByQuery($params);
+
         return $result;
     }
 
