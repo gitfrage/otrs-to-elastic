@@ -1,34 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_OTRS",
-      "label": "OTRS",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "elasticsearch",
-      "pluginName": "Elasticsearch"
-    }
-  ],
-  "__requires": [
-    {
-      "type": "datasource",
-      "id": "elasticsearch",
-      "name": "Elasticsearch",
-      "version": "3.0.0"
-    },
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "4.3.1"
-    },
-    {
-      "type": "panel",
-      "id": "singlestat",
-      "name": "Singlestat",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": []
   },
@@ -36,25 +6,107 @@
   "gnetId": null,
   "graphTooltip": 0,
   "hideControls": false,
-  "id": null,
+  "id": 4,
   "links": [],
   "refresh": false,
   "rows": [
     {
       "collapse": false,
-      "height": -748,
-      "panels": [],
-      "repeat": null,
-      "repeatIteration": null,
-      "repeatRowId": null,
-      "showTitle": false,
-      "title": "Dashboard Row",
-      "titleSize": "h6"
-    },
-    {
-      "collapse": false,
-      "height": -907,
+      "height": -4935,
       "panels": [
+        {
+          "columns": [
+            {
+              "text": "@timestamp",
+              "value": "@timestamp"
+            },
+            {
+              "text": "ticket_nr",
+              "value": "ticket_nr"
+            },
+            {
+              "text": "iteration",
+              "value": "iteration"
+            },
+            {
+              "text": "response_time",
+              "value": "response_time"
+            }
+          ],
+          "datasource": "OTRS",
+          "fontSize": "100%",
+          "height": "674px",
+          "id": 18,
+          "links": [],
+          "pageSize": 100,
+          "scroll": true,
+          "showHeader": true,
+          "sort": {
+            "col": null,
+            "desc": false
+          },
+          "span": 6,
+          "styles": [
+            {
+              "alias": "Time",
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "pattern": "Time",
+              "type": "date"
+            },
+            {
+              "alias": "",
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "dateFormat": "MMMM D, YYYY LT",
+              "decimals": 2,
+              "pattern": "@timestamp",
+              "thresholds": [],
+              "type": "date",
+              "unit": "short"
+            },
+            {
+              "alias": "",
+              "colorMode": null,
+              "colors": [
+                "rgba(245, 54, 54, 0.9)",
+                "rgba(237, 129, 40, 0.89)",
+                "rgba(50, 172, 45, 0.97)"
+              ],
+              "dateFormat": "YYYY-MM-DD HH:mm:ss",
+              "decimals": 2,
+              "pattern": "response_time",
+              "thresholds": [],
+              "type": "number",
+              "unit": "s"
+            }
+          ],
+          "targets": [
+            {
+              "bucketAggs": [],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "select field",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "raw_document"
+                }
+              ],
+              "query": "SendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "timeFrom": "7d",
+          "title": "All \"SendAnswer\" Events",
+          "transform": "json",
+          "type": "table"
+        },
         {
           "cacheTimeout": null,
           "colorBackground": false,
@@ -64,7 +116,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_OTRS}",
+          "datasource": "OTRS",
           "format": "none",
           "gauge": {
             "maxValue": 100,
@@ -73,8 +125,9 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
-          "height": "80px",
-          "id": 1,
+          "height": "160px",
+          "hideTimeOverride": false,
+          "id": 22,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -102,7 +155,7 @@
               "to": "null"
             }
           ],
-          "span": 2,
+          "span": 6,
           "sparkline": {
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
@@ -160,7 +213,106 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_OTRS}",
+          "datasource": "OTRS",
+          "decimals": null,
+          "format": "s",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "height": "160px",
+          "id": 12,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "avg"
+                }
+              ],
+              "query": "sendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "",
+          "title": "Average Response Time ALL Answers",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "OTRS",
           "decimals": null,
           "format": "dtdurations",
           "gauge": {
@@ -170,7 +322,8 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
-          "id": 2,
+          "height": "160px",
+          "id": 3,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -236,7 +389,7 @@
             }
           ],
           "thresholds": "",
-          "title": "Average Response Time FIRST Answer",
+          "title": "AVG Response Time FIRST Answer",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -257,7 +410,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_OTRS}",
+          "datasource": "OTRS",
           "decimals": null,
           "format": "dtdurations",
           "gauge": {
@@ -267,7 +420,8 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
-          "id": 3,
+          "height": "160px",
+          "id": 2,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -332,8 +486,8 @@
               "timeField": "@timestamp"
             }
           ],
-          "thresholds": "",
-          "title": "Average Response Time SECOND Answer",
+          "thresholds": "5 min",
+          "title": "AVG Response Time SECOND Answer",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -354,9 +508,8 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_OTRS}",
-          "decimals": null,
-          "format": "s",
+          "datasource": "OTRS",
+          "format": "none",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -364,8 +517,9 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
-          "height": "80px",
-          "id": 5,
+          "height": "160px",
+          "hideTimeOverride": false,
+          "id": 7,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -393,7 +547,7 @@
               "to": "null"
             }
           ],
-          "span": 2,
+          "span": 6,
           "sparkline": {
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
@@ -418,20 +572,20 @@
               "dsType": "elasticsearch",
               "metrics": [
                 {
-                  "field": "response_time",
+                  "field": "select field",
                   "id": "1",
-                  "meta": {},
-                  "settings": {},
-                  "type": "min"
+                  "type": "count"
                 }
               ],
-              "query": "sendAnswer AND response_time:>0",
+              "query": "SendAnswer",
               "refId": "A",
               "timeField": "@timestamp"
             }
           ],
           "thresholds": "",
-          "title": "Min Response Time",
+          "timeFrom": "7d",
+          "title": "Requests answered 7 days",
+          "transparent": false,
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -441,7 +595,7 @@
               "value": "null"
             }
           ],
-          "valueName": "min"
+          "valueName": "total"
         },
         {
           "cacheTimeout": null,
@@ -452,7 +606,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_OTRS}",
+          "datasource": "OTRS",
           "decimals": null,
           "format": "s",
           "gauge": {
@@ -462,106 +616,9 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
-          "height": "80px",
-          "id": 6,
-          "interval": null,
-          "links": [],
-          "mappingType": 1,
-          "mappingTypes": [
-            {
-              "name": "value to text",
-              "value": 1
-            },
-            {
-              "name": "range to text",
-              "value": 2
-            }
-          ],
-          "maxDataPoints": 100,
-          "nullPointMode": "connected",
-          "nullText": null,
-          "postfix": "",
-          "postfixFontSize": "50%",
-          "prefix": "",
-          "prefixFontSize": "50%",
-          "rangeMaps": [
-            {
-              "from": "null",
-              "text": "N/A",
-              "to": "null"
-            }
-          ],
-          "span": 2,
-          "sparkline": {
-            "fillColor": "rgba(31, 118, 189, 0.18)",
-            "full": false,
-            "lineColor": "rgb(31, 120, 193)",
-            "show": false
-          },
-          "tableColumn": "",
-          "targets": [
-            {
-              "bucketAggs": [
-                {
-                  "field": "@timestamp",
-                  "id": "2",
-                  "settings": {
-                    "interval": "auto",
-                    "min_doc_count": 0,
-                    "trimEdges": 0
-                  },
-                  "type": "date_histogram"
-                }
-              ],
-              "dsType": "elasticsearch",
-              "metrics": [
-                {
-                  "field": "response_time",
-                  "id": "1",
-                  "meta": {},
-                  "settings": {},
-                  "type": "max"
-                }
-              ],
-              "query": "sendAnswer",
-              "refId": "A",
-              "timeField": "@timestamp"
-            }
-          ],
-          "thresholds": "",
-          "title": "Max Response Time",
-          "type": "singlestat",
-          "valueFontSize": "80%",
-          "valueMaps": [
-            {
-              "op": "=",
-              "text": "N/A",
-              "value": "null"
-            }
-          ],
-          "valueName": "max"
-        },
-        {
-          "cacheTimeout": null,
-          "colorBackground": false,
-          "colorValue": false,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "datasource": "${DS_OTRS}",
-          "decimals": null,
-          "format": "s",
-          "gauge": {
-            "maxValue": 100,
-            "minValue": 0,
-            "show": false,
-            "thresholdLabels": false,
-            "thresholdMarkers": true
-          },
-          "height": "80px",
-          "id": 4,
+          "height": "160px",
+          "hideTimeOverride": true,
+          "id": 19,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -627,7 +684,9 @@
             }
           ],
           "thresholds": "",
-          "title": "Average Response Time",
+          "timeFrom": "7d",
+          "title": "Average Response Time ALL Answers",
+          "transparent": false,
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -648,8 +707,9 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_OTRS}",
-          "format": "none",
+          "datasource": "OTRS",
+          "decimals": null,
+          "format": "dtdurations",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -657,8 +717,9 @@
             "thresholdLabels": false,
             "thresholdMarkers": true
           },
-          "height": "80px",
-          "id": 7,
+          "height": "160px",
+          "hideTimeOverride": true,
+          "id": 20,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -711,20 +772,21 @@
               "dsType": "elasticsearch",
               "metrics": [
                 {
-                  "field": "select field",
+                  "field": "response_time",
                   "id": "1",
-                  "type": "count"
+                  "meta": {},
+                  "settings": {},
+                  "type": "avg"
                 }
               ],
-              "query": "SendAnswer",
+              "query": "iteration:1 AND sendAnswer",
               "refId": "A",
               "timeField": "@timestamp"
             }
           ],
           "thresholds": "",
           "timeFrom": "7d",
-          "title": "Requests answered",
-          "transparent": false,
+          "title": "AVG Response Time FIRST Answer",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -734,13 +796,113 @@
               "value": "null"
             }
           ],
-          "valueName": "total"
+          "valueName": "avg"
+        },
+        {
+          "cacheTimeout": null,
+          "colorBackground": false,
+          "colorValue": false,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "datasource": "OTRS",
+          "decimals": null,
+          "format": "dtdurations",
+          "gauge": {
+            "maxValue": 100,
+            "minValue": 0,
+            "show": false,
+            "thresholdLabels": false,
+            "thresholdMarkers": true
+          },
+          "height": "160px",
+          "hideTimeOverride": true,
+          "id": 21,
+          "interval": null,
+          "links": [],
+          "mappingType": 1,
+          "mappingTypes": [
+            {
+              "name": "value to text",
+              "value": 1
+            },
+            {
+              "name": "range to text",
+              "value": 2
+            }
+          ],
+          "maxDataPoints": 100,
+          "nullPointMode": "connected",
+          "nullText": null,
+          "postfix": "",
+          "postfixFontSize": "50%",
+          "prefix": "",
+          "prefixFontSize": "50%",
+          "rangeMaps": [
+            {
+              "from": "null",
+              "text": "N/A",
+              "to": "null"
+            }
+          ],
+          "span": 2,
+          "sparkline": {
+            "fillColor": "rgba(31, 118, 189, 0.18)",
+            "full": false,
+            "lineColor": "rgb(31, 120, 193)",
+            "show": false
+          },
+          "tableColumn": "",
+          "targets": [
+            {
+              "bucketAggs": [
+                {
+                  "field": "@timestamp",
+                  "id": "2",
+                  "settings": {
+                    "interval": "auto",
+                    "min_doc_count": 0,
+                    "trimEdges": 0
+                  },
+                  "type": "date_histogram"
+                }
+              ],
+              "dsType": "elasticsearch",
+              "metrics": [
+                {
+                  "field": "response_time",
+                  "id": "1",
+                  "meta": {},
+                  "settings": {},
+                  "type": "avg"
+                }
+              ],
+              "query": "iteration:2 AND sendAnswer",
+              "refId": "A",
+              "timeField": "@timestamp"
+            }
+          ],
+          "thresholds": "5 min",
+          "timeFrom": "7d",
+          "title": "AVG Response Time SECOND Answer",
+          "type": "singlestat",
+          "valueFontSize": "80%",
+          "valueMaps": [
+            {
+              "op": "=",
+              "text": "N/A",
+              "value": "null"
+            }
+          ],
+          "valueName": "avg"
         }
       ],
       "repeat": null,
       "repeatIteration": null,
       "repeatRowId": null,
-      "showTitle": false,
+      "showTitle": true,
       "title": "Dashboard Row",
       "titleSize": "h6"
     }
@@ -781,6 +943,6 @@
     ]
   },
   "timezone": "browser",
-  "title": "otrs-kpi",
-  "version": 2
+  "title": "OTRS",
+  "version": 37
 }

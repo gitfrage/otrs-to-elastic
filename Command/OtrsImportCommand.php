@@ -4,7 +4,7 @@ namespace Otrs\Import\Command;
 
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\Command as Commando;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,7 +17,8 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Otrs\Import
  */
-class OtrsImportCommand extends Command
+class OtrsImportCommand extends Commando
+#class OtrsImportCommand extends \Symfony_Component_Console_Command_Command # Command
 {
     const LOG_LEVEL_WARN  = 'comment';
     const LOG_LEVEL_ERROR = 'error';
@@ -41,6 +42,7 @@ class OtrsImportCommand extends Command
     protected function configure()
     {
         $this->setName('otrs:import:ticket:history');
+        
         $this->addOption(
             'configfile',
             'f',
@@ -49,10 +51,25 @@ class OtrsImportCommand extends Command
             'config/config.yml'
         );
 
-        $this->addArgument(
+        $this->addOption(
             'date',
-            InputArgument::REQUIRED,
-            'Date to start import from.'
+            'd',
+            InputOption::VALUE_REQUIRED,
+            'Date to start import from'
+        );
+
+        $this->addOption(
+            'initial',
+            'i',
+            InputOption::VALUE_NONE,
+            'call it for initial import - this will skip date filter on ebents'
+        );
+
+        $this->addOption(
+            'tn',
+            't',
+            InputOption::VALUE_REQUIRED,
+            'Ticket Nummer for import'
         );
     }
 
@@ -68,10 +85,10 @@ class OtrsImportCommand extends Command
             'elastic' => [
                 'host'  => '127.0.0.1',
                 'port'  => 9200,
-                'index' => 'otrs',
+                'index' => 'otrstest',
             ],
             'mysql'   => [
-                'dbname' => 'otrs',
+                'dbname' => 'otrs2',
                 'host'   => 'localhost',
                 'user'   => 'root',
                 'pass'   => 'root',
@@ -130,7 +147,7 @@ class OtrsImportCommand extends Command
      * @param string $date
      * @return array
      */
-    private function gatherTickets($date)
+    private function gatherTicketsByDate($date)
     {
         $query = 'SELECT id, tn, title FROM ticket WHERE change_time > ' . $this->dbConnection->quote($date);
 
@@ -144,6 +161,26 @@ class OtrsImportCommand extends Command
     }
 
     /**
+     * Returns a ticket by ticket number.
+     *
+     * @param string $id
+     * @return array
+     */
+    private function gatherTicketsByTn($tn)
+    {
+        $query = 'SELECT id, tn, title FROM ticket WHERE tn = ' . $this->dbConnection->quote($tn);
+
+        $ticket = $this->dbConnection->query($query)->fetchAll();
+        if (count($ticket) == 0) {
+            $this->log('No tickets found', self::LOG_LEVEL_WARN);
+            exit(0);
+        }
+
+        return $ticket;
+    }
+
+
+    /**
      * Returns a prepared statement to retrieved list of ticket history events.
      *
      * @return \PDOStatement
@@ -151,25 +188,20 @@ class OtrsImportCommand extends Command
     private function getPreparedStatement()
     {
         return $this->dbConnection->prepare('
-            SELECT 		th.ticket_id,
+            SELECT      th.ticket_id,
                         th.create_time,
+                        th.change_time,
+                        th.name,
                         tht.name AS history_type
-            FROM 		ticket t
-            INNER JOIN 	ticket_history th ON t.id = th.ticket_id
-            INNER JOIN 	ticket_history_type tht ON th.history_type_id = tht.id
-            LEFT JOIN	article a ON th.article_id = a.id
-            LEFT JOIN	article_type at ON at.id = a.article_type_id
-            WHERE 		t.id = :id
-            AND 		tht.name IN ("EmailCustomer", "SendAnswer", "FollowUp")
-            AND 		at.name = "email-external"
-            AND 		th.change_time NOT IN (
-                SELECT change_time 
-                FROM ticket_history 
-                WHERE ticket_id = :id
-                AND change_by = 1 
-                AND (ticket_history.name LIKE "%customer response required%" OR ticket_history.name LIKE "%internal response required%")
-            )
-		');
+            FROM        ticket t
+            INNER JOIN  ticket_history th ON t.id = th.ticket_id
+            INNER JOIN  ticket_history_type tht ON th.history_type_id = tht.id
+            LEFT JOIN   article a ON th.article_id = a.id
+            LEFT JOIN   article_type at ON at.id = a.article_type_id
+            WHERE       t.id = :id
+            AND         tht.name IN ("EmailCustomer", "SendAnswer", "FollowUp")
+            AND         at.name = "email-external"
+        ');
     }
 
     /**
@@ -213,29 +245,40 @@ class OtrsImportCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $startTime = microtime(true);
-        $startDate = $input->getArgument('date');
-        if (strtotime($startDate) === false) {
-            throw new \InvalidArgumentException('Invalid date format given');
+
+        if ((empty($input->getOption('date')) && empty($input->getOption('tn'))) || 
+            (!empty($input->getOption('date')) && !empty($input->getOption('tn')))) {
+             throw new \InvalidArgumentException('Exsact one option (from two) required!');
         }
 
-        $deleted = $this->elasticDeleteByQuery($startDate);
-        if ($output->isVerbose()) {
-            $this->log(
-                sprintf('%d deleted events', $deleted['deleted']),
-                self::LOG_LEVEL_INFO
-            );
+        if (!empty($input->getOption('tn'))) {
+            $tn = $input->getOption('tn');
+            $tickets = $this->gatherTicketsByTn($tn);
+        }
+
+        if (!empty($input->getOption('date'))) {
+            $startDate = $input->getOption('date');
+            if (strtotime($startDate) === false) {
+                throw new \InvalidArgumentException('Invalid date format given');
+            }
+            $deleted = $this->elasticDeleteByQuery($startDate);
+            if ($output->isVerbose()) {
+                $this->log(
+                    sprintf('%d deleted events', $deleted['deleted']),
+                    self::LOG_LEVEL_INFO
+                );
+            }
+            $tickets = $this->gatherTicketsByDate($startDate);
         }
 
         $prep    = $this->getPreparedStatement();
-        $tickets = $this->gatherTickets($startDate);
 
         $params = [
             'body' => [],
         ];
 
         foreach ($tickets as $ticket) {
-            // get history per ticket
-            // exclude some events (filter "FollowUp" events from internal actions)
+
             $prep->bindValue('id', $ticket['id']);
 
             if (!$prep->execute()) {
@@ -243,9 +286,8 @@ class OtrsImportCommand extends Command
                 exit(1);
             }
 
-            $this->log(
-                sprintf(
-                    'Start import ticket [ %s #%d]',
+            $this->log(sprintf(
+                    'Start import ticket [%s #%d]',
                     $ticket['title'],
                     $ticket['tn']
                 ),
@@ -269,33 +311,31 @@ class OtrsImportCommand extends Command
             }
 
             foreach ($ticket_history_rows as $row) {
-                // standard case:
-                // lastEvent "EmailCustomer or FollowUp" --> "SendAnswer"
 
                 $responseTime = 0;
 
-                if (!empty($lastEvent['history_type'])) {
-                    if ($row['history_type'] == 'SendAnswer' &&
-                        ($lastEvent['history_type'] == 'EmailCustomer' || $lastEvent['history_type'] == 'FollowUp')
-                    ) {
-                        ++$iteration;
-                        $responseTime = strtotime($row['create_time']) - strtotime($lastEvent['create_time']);
-                    }
+                // skip already imported events on following imports
 
-                    switch (true) {
-                        // edge case:
-                        // "FollowUp" --> "FollowUp"
-                        case ($row['history_type'] == 'FollowUp' && $lastEvent['history_type'] == 'FollowUp'):
-                            $row['create_time'] = $lastEvent['create_time'];
-                            break;
-
-                        // edge case:
-                        // "SendAnswer" --> "SendAnswer"
-                        case ($row['history_type'] == 'SendAnswer' && $lastEvent['history_type'] == 'SendAnswer'):
-                            continue 2;
-                    }
+                if (!$input->getOption('initial') && isset($startDate) && $startDate < $row['change_time']) {
+                    $this->log(sprintf(
+                            'skip event in initial [%s ]',
+                            $row['history_type']
+                        ),
+                        self::LOG_LEVEL_INFO
+                    );
+                    continue;
                 }
 
+                // filter internal (Responsible Update ect) event:
+                // if (preg_match('/' . $ticket['tn'] . '/', $row['name'] ))  continue;    
+
+                // set counter and responseTime only by "SendAnswer" events
+
+                if (!empty($lastEvent['history_type']) && $row['history_type'] == 'SendAnswer') {
+                    ++$iteration;
+                    $responseTime = strtotime($row['create_time']) - strtotime($lastEvent['create_time']);
+                }
+                    
                 // build params for elastic
                 $params['body'][] = [
                     'index' => [
@@ -303,6 +343,7 @@ class OtrsImportCommand extends Command
                         '_type'  => 'app',
                     ],
                 ];
+
                 $params['body'][] = [
                     '@timestamp'             => gmdate("Y-m-d\TH:i:s\Z", strtotime($row['create_time'])),
                     'history_type'           => $row['history_type'],
@@ -314,6 +355,15 @@ class OtrsImportCommand extends Command
                     // Debugging
                     'response_time_in_hours' => gmdate("H i", $responseTime),
                 ];
+
+                $this->log(sprintf(
+                        'Start import ticket history [%s #%d #%d]',
+                        $row['history_type'],
+                        $iteration,
+                        $responseTime
+                    ),
+                    self::LOG_LEVEL_INFO
+                );
 
                 $lastEvent = $row;
             }
