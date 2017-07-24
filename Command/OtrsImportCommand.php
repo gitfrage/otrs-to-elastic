@@ -4,7 +4,7 @@ namespace Otrs\Import\Command;
 
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
-use Symfony\Component\Console\Command\Command as Commando;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,8 +17,7 @@ use Symfony\Component\Yaml\Yaml;
  *
  * @package Otrs\Import
  */
-class OtrsImportCommand extends Commando
-#class OtrsImportCommand extends \Symfony_Component_Console_Command_Command # Command
+class OtrsImportCommand extends Command
 {
     const LOG_LEVEL_WARN  = 'comment';
     const LOG_LEVEL_ERROR = 'error';
